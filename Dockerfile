@@ -10,4 +10,4 @@ RUN pip install --upgrade pip && \
 COPY ./news /app/
 CMD python manage.py makemigrations --noinput \
     && python manage.py migrate --noinput \
-    && gunicorn /news.wsgi:application --bind 0.0.0.0:8000
+    && gunicorn news.wsgi:application --bind 0.0.0.0:8000
