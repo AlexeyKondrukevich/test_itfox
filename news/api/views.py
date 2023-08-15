@@ -2,13 +2,12 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 
 from .mixins import LikedMixin
-from .permissions import IsAdmin
+from .permissions import IsAdminOrOwner, IsAuthenticatedOrReadonly
 from .serializers import (
     CommentSerializer,
     ConfirmationCodeSerializer,
@@ -25,8 +24,6 @@ from users.models import User
 class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    # permission_classes = (IsAdmin,)
-    # pagination_class = PageNumberPagination
     lookup_field = "username"
 
 
@@ -49,7 +46,6 @@ def sent_confirmation_code(request):
 class SignUp(APIView):
     queryset = User.objects.all()
     serializer_class = SingUpSerializer
-    permission_classes = (AllowAny,)
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -60,8 +56,6 @@ class SignUp(APIView):
 
 
 class APIObtainToken(APIView):
-    permission_classes = (AllowAny,)
-
     def post(self, request):
         serializer = GetTokenSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -80,10 +74,10 @@ class APIObtainToken(APIView):
 class NewsViewSet(LikedMixin, viewsets.ModelViewSet):
     queryset = News.objects.all()
     serializer_class = NewsSerializer
-    # permission_classes = (
-    #     IsAuthenticated,
-    #     AuthorModeratorOrReadOnly,
-    # )
+    permission_classes = (
+        IsAuthenticatedOrReadonly,
+        IsAdminOrOwner,
+    )
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
@@ -91,7 +85,10 @@ class NewsViewSet(LikedMixin, viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
-    # permission_classes = (IsStaffOrAuthorOrReadOnly,)
+    permission_classes = (
+        IsAuthenticatedOrReadonly,
+        IsAdminOrOwner,
+    )
 
     def get_queryset(self):
         queryset = Comment.objects.filter(news_id=self.kwargs.get("news_id"))
