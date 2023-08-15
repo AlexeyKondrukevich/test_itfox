@@ -34,6 +34,10 @@ class User(AbstractUser):
         "Фамилия пользователя", max_length=150, blank=True
     )
 
+    REQUIRED_FIELDS = [
+        "email",
+    ]
+
     class Meta:
         verbose_name = "Пользователь"
         verbose_name_plural = "Пользователи"
