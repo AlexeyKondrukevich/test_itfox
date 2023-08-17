@@ -16,15 +16,37 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
-class ConfirmationCodeSerializer(serializers.Serializer):
-    username = serializers.CharField(required=True)
-    email = serializers.EmailField(required=True)
+# class ConfirmationCodeSerializer(serializers.Serializer):
+#     username = serializers.CharField()
+#     confirmation_code = serializers.SerializerMethodField()
+# confirmation_code = serializers.SerializerMethodField()
+
+# class Meta:
+#     model = User
+#     fields = ("username", "email", "confirmation_code")
+#     read_only = ("confirmation_code",)
+
+# def get_confirmation_code(self, obj):
+# serializer = ConfirmationCodeSerializer()
+# serializer.is_valid(raise_exception=True)
+# username = serializer.validated_data.get("username")
+# email = serializer.validated_data.get("email")
+# user = get_object_or_404(User, username=username)
+# return obj.confirmation_code
 
 
 class SingUpSerializer(serializers.ModelSerializer):
+    # confirmation_code = serializers.SerializerMethodField()
+    # confirmation_code = serializers.CharField(read_only=True)
+
     class Meta:
         model = User
-        fields = ("username", "email")
+        # fields = ("username", "email", "confirmation_code")
+        fields = (
+            "username",
+            "email",
+        )
+        # read_only = ("confirmation_code",)
 
     def create(self, validated_data):
         user = User.objects.create(
@@ -32,6 +54,17 @@ class SingUpSerializer(serializers.ModelSerializer):
             email=self.validated_data["email"],
         )
         return user
+
+    # def get_confirmation_code(self, obj):
+    # serializer = ConfirmationCodeSerializer()
+    # serializer.is_valid(raise_exception=True)
+    # username = serializer.validated_data.get("username")
+    # email = serializer.validated_data.get("email")
+    # user = get_object_or_404(User, username=username)
+    # return obj.confirmation_code
+
+    # def to_representation(self, instance):
+    #     return ConfirmationCodeSerializer(instance).data
 
 
 class GetTokenSerializer(serializers.Serializer):

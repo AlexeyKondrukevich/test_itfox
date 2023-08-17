@@ -31,7 +31,7 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # DEBUG = bool(os.environ.get("DEBUG", 0))
-DEBUG = False
+DEBUG = True
 ALLOWED_HOSTS = ["*"]
 
 
@@ -87,24 +87,24 @@ WSGI_APPLICATION = "news.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-if "test" in sys.argv:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
-        }
+# if "test" in sys.argv:
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": os.environ["DB_ENGINE"],
-            "NAME": os.environ["DB_NAME"],
-            "USER": os.environ["POSTGRES_USER"],
-            "PASSWORD": os.environ["POSTGRES_PASSWORD"],
-            "HOST": os.environ["DB_HOST"],
-            "PORT": os.environ["DB_PORT"],
-        }
-    }
+}
+# else:
+#     DATABASES = {
+#         "default": {
+#             "ENGINE": os.environ["DB_ENGINE"],
+#             "NAME": os.environ["DB_NAME"],
+#             "USER": os.environ["POSTGRES_USER"],
+#             "PASSWORD": os.environ["POSTGRES_PASSWORD"],
+#             # "HOST": os.environ["DB_HOST"],
+#             # "PORT": os.environ["DB_PORT"],
+#         }
+#     }
 
 
 # Password validation

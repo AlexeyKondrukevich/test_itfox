@@ -1,5 +1,6 @@
 from django.contrib.auth.tokens import default_token_generator
-from django.core.mail import send_mail
+
+# from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets
 from rest_framework.response import Response
@@ -10,14 +11,15 @@ from .mixins import LikedMixin
 from .permissions import IsAdminOrOwner, IsAuthenticatedOrReadonly
 from .serializers import (
     CommentSerializer,
-    ConfirmationCodeSerializer,
+    # ConfirmationCodeSerializer,
     GetTokenSerializer,
     NewsSerializer,
     SingUpSerializer,
     UserSerializer,
 )
 from comments.models import Comment, News
-from news.settings import DEFAULT_FROM_EMAIL
+
+# from news.settings import DEFAULT_FROM_EMAIL
 from users.models import User
 
 
@@ -27,20 +29,20 @@ class UsersViewSet(viewsets.ModelViewSet):
     lookup_field = "username"
 
 
-def sent_confirmation_code(request):
-    serializer = ConfirmationCodeSerializer(data=request.data)
-    serializer.is_valid(raise_exception=True)
-    username = serializer.validated_data.get("username")
-    email = serializer.validated_data.get("email")
-    user = get_object_or_404(User, username=username)
-    confirmation_code = default_token_generator.make_token(user)
-    return send_mail(
-        "Код подтверждения",
-        f"Ваш код подтверждения: {confirmation_code}",
-        [DEFAULT_FROM_EMAIL],
-        [email],
-        fail_silently=False,
-    )
+# def sent_confirmation_code(request):
+#     serializer = ConfirmationCodeSerializer(data=request.data)
+#     serializer.is_valid(raise_exception=True)
+#     username = serializer.validated_data.get("username")
+#     email = serializer.validated_data.get("email")
+#     user = get_object_or_404(User, username=username)
+#     confirmation_code = default_token_generator.make_token(user)
+#     return send_mail(
+#         "Код подтверждения",
+#         f"Ваш код подтверждения: {confirmation_code}",
+#         [DEFAULT_FROM_EMAIL],
+#         [email],
+#         fail_silently=False,
+#     )
 
 
 class SignUp(APIView):
@@ -51,8 +53,19 @@ class SignUp(APIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        sent_confirmation_code(request)
-        return Response(request.data, status=status.HTTP_200_OK)
+        # sent_confirmation_code(request)
+        username = serializer.validated_data.get("username")
+        # email = serializer.validated_data.get("email")
+        user = get_object_or_404(User, username=username)
+        confirmation_code = default_token_generator.make_token(user)
+        # User.objects.filter(username=username).update(
+        #     confirmation_code=confirmation_code
+        # )
+        # return Response(request.data, status=status.HTTP_200_OK)
+        return Response(
+            {"confirmation_code": str(confirmation_code)},
+            status=status.HTTP_200_OK,
+        )
 
 
 class APIObtainToken(APIView):
